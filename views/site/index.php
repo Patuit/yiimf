@@ -1,6 +1,9 @@
-<?php $this->title = 'Журналы' ?>
-<?php use yii\helpers\Html; ?>
-<?php echo Html::a('Create New Post', array('site/create'), array('class' => 'btn btn-primary pull-right')); ?>
+<?php
+$this->title = 'Журналы';
+use yii\helpers\Html;
+use yii\widgets\LinkPager;
+
+echo Html::a('Create New Post', array('site/create'), array('class' => 'btn btn-primary pull-right')); ?>
     <div class="clearfix"></div>
     <hr/>
     <table class="table table-striped table-hover">
@@ -35,12 +38,17 @@
     <hr>
 <?php if (Yii::$app->session->hasFlash('PostDeletedError')): ?>
     <div class="alert alert-error">
-        There was an error deleting your post!
+        При удалении журнала из базы данных произошла ошибка!
     </div>
 <?php endif; ?>
 
 <?php if (Yii::$app->session->hasFlash('PostDeleted')): ?>
     <div class="alert alert-success">
-        Your post has successfully been deleted!
+        Журнал был успешно удален из базы данных!
     </div>
 <?php endif; ?>
+
+
+<?= LinkPager::widget([
+    'pagination' => $pages,
+]); ?>

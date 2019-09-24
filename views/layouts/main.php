@@ -9,6 +9,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use yii\widgets\Pjax;
 
 AppAsset::register($this);
 ?>
@@ -28,7 +29,10 @@ AppAsset::register($this);
 <!--    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>-->
 </head>
 <body>
-<?php $this->beginBody() ?>
+<?php
+$this->beginBody();
+Pjax::begin();
+?>
 
 <div class="wrap">
     <?php
@@ -69,7 +73,7 @@ AppAsset::register($this);
         <?= $content ?>
     </div>
 </div>
-
+<?php Pjax::end(); ?>
 <footer class="footer">
     <div class="container">
         <p class="pull-left">&copy; My Company <?= date('Y') ?></p>

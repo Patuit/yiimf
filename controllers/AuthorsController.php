@@ -7,34 +7,21 @@ use Yii;
 use \yii\base\HttpException;
 use yii\web\Controller;
 use app\models\Authors;
-use app\models\Magazins;
-use app\models\MagazinsAuthors;
+use yii\data\Pagination;
 
 class AuthorsController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
-    }
-
 
     public function actionIndex()
     {
-        $post = new Authors;
-        $data = $post->find()->all();
-        echo $this->render('index', array(
-            'data' => $data
+        $data = Authors::find();
+        $pages = new Pagination(['totalCount' => $data->count(), 'pageSize' => 5]);
+        $data = $data->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
+        return $this->render('index', array(
+            'data' => $data,
+            'pages' => $pages,
         ));
     }
 
@@ -61,7 +48,7 @@ class AuthorsController extends Controller
         if ($post === NULL)
             throw new HttpException(404, 'Document Does Not Exist');
 
-        echo $this->render('read', array(
+        return $this->render('read', array(
             'post' => $post,
             'magazins' => $magazins
         ));
@@ -110,16 +97,19 @@ class AuthorsController extends Controller
     public function actionCreate()
     {
         $model = new Authors();
-        if (isset($_POST['Authors'])) {
-            $model->name = $_POST['Authors']['name'];
-            $model->second_name = $_POST['Authors']['second_name'];
-            $model->third_name = $_POST['Authors']['third_name'];
-
-            if ($model->save())
-                Yii::$app->response->redirect(array('site/read', 'id' => $model->id));
+        if (Yii::$app->request->isPjax) {
+            $post = \Yii::$app->request->post();
+            $model->name = $post['Authors']['name'];
+            $model->second_name = $post['Authors']['second_name'];
+            $model->third_name = $post['Authors']['third_name'];
+            if ($model->save()) {
+                Yii::$app->session->setFlash('AuthorsCreateSuccess');
+            } else {
+                Yii::$app->session->setFlash('AuthorsCreateError');
+            }
         }
 
-        echo $this->render('create', array(
+        return $this->render('create', array(
             'model' => $model
         ));
     }
@@ -141,16 +131,20 @@ class AuthorsController extends Controller
         if ($model === NULL)
             throw new HttpException(404, 'Document Does Not Exist');
 
-        if (isset($_POST['Authors'])) {
-            $model->name = $_POST['Authors']['name'];
-            $model->second_name = $_POST['Authors']['second_name'];
-            $model->third_name = $_POST['Authors']['third_name'];
+        if (Yii::$app->request->isPjax) {
+            $post = \Yii::$app->request->post();
+            $model->name = $post['Authors']['name'];
+            $model->second_name = $post['Authors']['second_name'];
+            $model->third_name = $post['Authors']['third_name'];
+            if ($model->save()) {
+                Yii::$app->session->setFlash('AuthorsUpdateSuccess');
+            } else {
+                Yii::$app->session->setFlash('AuthorsUpdateError');
+            }
 
-            if ($model->save())
-                Yii::$app->response->redirect(array('site/read', 'id' => $model->id));
         }
 
-        echo $this->render('create', array(
+        return $this->render('create', array(
             'model' => $model
         ));
     }

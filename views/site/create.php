@@ -1,16 +1,17 @@
 <?php
 
 use app\models\Authors;
-use app\models\MagazinsAuthors;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 
+
 $form = ActiveForm::begin([
-    'id' => 'form-input-example',
+    'id' => 'form-create-magazines',
     'options' => [
         'class' => 'form-horizontal col-lg-11',
-        'enctype' => 'multipart/form-data'
+        'enctype' => 'multipart/form-data',
+        'data-pjax' => true,
     ],
 ]);
 ?>

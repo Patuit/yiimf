@@ -35,6 +35,7 @@ class Magazins extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['date'], 'safe'],
             [['title', 'image'], 'string', 'max' => 255],
+            [['title'], 'required'],
         ];
     }
 

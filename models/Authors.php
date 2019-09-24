@@ -31,6 +31,7 @@ class Authors extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'second_name', 'third_name'], 'string', 'max' => 255],
+            [['name', 'second_name'], 'required'],
         ];
     }
 

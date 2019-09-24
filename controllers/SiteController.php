@@ -15,6 +15,8 @@ use app\models\Authors;
 use app\models\MagazinsAuthors;
 use app\models\UploadImage;
 use yii\web\UploadedFile;
+use yii\widgets\Pjax;
+use yii\data\Pagination;
 
 class SiteController extends Controller
 {
@@ -67,8 +69,11 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $data = Magazins::find()->all();
-
+        $data = Magazins::find();
+        $pages = new Pagination(['totalCount' => $data->count(), 'pageSize' => 5]);
+        $data = $data->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
         $authors = [];
         foreach ($data as $key => $item) {
             if ($item->getMagazinsAuthors()->with('aut')->all()) {
@@ -83,9 +88,10 @@ class SiteController extends Controller
             $answer[] = $item;
         }
 
-        echo $this->render('index', array(
+        return $this->render('index', array(
             'data' => $answer,
             'authors' => $authors,
+            'pages' => $pages,
         ));
     }
 
@@ -112,7 +118,7 @@ class SiteController extends Controller
         if ($magazinsModel === NULL)
             throw new HttpException(404, 'Document Does Not Exist');
 
-        echo $this->render('read', array(
+        return $this->render('read', array(
             'post' => $magazinsModel,
             'authors' => $authorsStr,
         ));
@@ -143,7 +149,7 @@ class SiteController extends Controller
     public function actionCreate()
     {
         $imageModel = new UploadImage();
-        if (Yii::$app->request->isPost) {
+        if (Yii::$app->request->isPjax) {
             $imageModel->image = UploadedFile::getInstance($imageModel, 'image');
             $imageModel->upload();
         }
@@ -151,27 +157,32 @@ class SiteController extends Controller
         $model = new Magazins();
         $authors = new Authors();
         $magazinsAuthors = new MagazinsAuthors();
-        if (isset($_POST['Magazins'])) {
-            $model->title = $_POST['Magazins']['title'];
-            $model->description = $_POST['Magazins']['description'];
+        if (Yii::$app->request->isPjax) {
+            $post = \Yii::$app->request->post();
+            $model->title = $post['Magazins']['title'];
+            $model->description = $post['Magazins']['description'];
             $model->image = $imageModel->image->name;
-            $model->date = $_POST['Magazins']['date'];
+            $model->date = $post['Magazins']['date'];
             $model->save();
             if ($model->save()) {
                 $lastIdMagazins = $model->id;
 
                 $magazinsAuthorsArray = [];
-                foreach ($_POST['Authors']['id'] as $item) {
+                foreach ($post['Authors']['id'] as $item) {
                     $magazinsAuthorsArray[] = [$lastIdMagazins, $item];
                 }
                 Yii::$app->db->createCommand()->batchInsert($magazinsAuthors->tableName(), ['id_mag', 'id_aut'], $magazinsAuthorsArray)->execute();
 
 //                Yii::$app->response->redirect(array('site/read', 'id' => $model->id));
             }
-
+            return $this->render('create', array(
+                'model' => $model,
+                'authors' => $authors,
+                'imageModel' => $imageModel,
+            ));
         }
 
-        echo $this->render('create', array(
+        return $this->render('create', array(
             'model' => $model,
             'authors' => $authors,
             'imageModel' => $imageModel,
@@ -201,11 +212,12 @@ class SiteController extends Controller
         if ($model === NULL)
             throw new HttpException(404, 'Document Does Not Exist');
 
-        if (isset($_POST['Magazins'])) {
-            $model->title = $_POST['Magazins']['title'];
-            $model->description = $_POST['Magazins']['description'];
+        if (Yii::$app->request->isPjax) {
+            $post = \Yii::$app->request->post();
+            $model->title = $post['Magazins']['title'];
+            $model->description = $post['Magazins']['description'];
             $model->image = $imageModel->image->name;
-            $model->date = $_POST['Magazins']['date'];
+            $model->date = $post['Magazins']['date'];
             $model->save();
             if ($model->save()) {
                 $magazinsAuthors = MagazinsAuthors::find();
@@ -213,17 +225,17 @@ class SiteController extends Controller
                 $lastIdMagazins = MagazinsAuthors::find()->orderBy(['id' => SORT_DESC])->offset(1)->one();
                 if ($authors === NULL) {
                     // Если журналу не соответвует ни один автор
-                    foreach ($_POST['Authors']['id'] as $item) {
+                    foreach ($post['Authors']['id'] as $item) {
                         $magazinsAuthors = new MagazinsAuthors();
                         $magazinsAuthors->id_aut = $item;
                         $magazinsAuthors->id_mag = $id;
                         $magazinsAuthors->save();
                     }
                 } else {
-                    $countNewAuthors = count($_POST['Authors']['id']);
+                    $countNewAuthors = count($post['Authors']['id']);
                     $countOldAuthors = count($authorsArray);
-                    $removeAuthors = array_diff($authorsArray, $_POST['Authors']['id']);
-                    $addAuthors = array_diff($_POST['Authors']['id'], $authorsArray);
+                    $removeAuthors = array_diff($authorsArray, $post['Authors']['id']);
+                    $addAuthors = array_diff($post['Authors']['id'], $authorsArray);
                     foreach ($addAuthors as $item) {
                         $addMagazinsAuthorsArray[] = [$lastIdMagazins + 1, $item];
                     }
@@ -258,9 +270,15 @@ class SiteController extends Controller
 
                 Yii::$app->response->redirect(array('site/read', 'id' => $model->id));
             }
+            return $this->render('create', array(
+                'model' => $model,
+                'authors' => $authors,
+                'authorsArray' => $authorsArray,
+                'imageModel' => $imageModel,
+            ));
         }
         $authors = new Authors();
-        echo $this->render('create', array(
+        return $this->render('create', array(
             'model' => $model,
             'authors' => $authors,
             'authorsArray' => $authorsArray,

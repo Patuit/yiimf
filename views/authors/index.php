@@ -1,4 +1,7 @@
-<?php use yii\helpers\Html; ?>
+<?php
+use yii\helpers\Html;
+use yii\widgets\LinkPager;
+?>
 <?php $this->title = 'Авторы' ?>
 <?php echo Html::a('Create New Post', array('authors/create'), array('class' => 'btn btn-primary pull-right')); ?>
     <div class="clearfix"></div>
@@ -29,12 +32,16 @@
     <hr>
 <?php if(Yii::$app->session->hasFlash('PostDeletedError')): ?>
     <div class="alert alert-error">
-        There was an error deleting your post!
+        При удалении автора из базы данных произошла ошибка!
     </div>
 <?php endif; ?>
 
 <?php if(Yii::$app->session->hasFlash('PostDeleted')): ?>
     <div class="alert alert-success">
-        Your post has successfully been deleted!
+        Автор был успешно удален из базы данных!
     </div>
 <?php endif; ?>
+
+<?= LinkPager::widget([
+    'pagination' => $pages,
+]); ?>
