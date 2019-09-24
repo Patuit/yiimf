@@ -14,9 +14,9 @@
         <?php foreach ($data as $post): ?>
             <tr>
                 <td>
-                    <?php echo Html::a($post->id, array('site/read', 'id'=>$post->id)); ?>
+                    <?php echo Html::a($post->id, array('authors/read', 'id'=>$post->id)); ?>
                 </td>
-                <td><?php echo Html::a($post->name, array('site/read', 'id'=>$post->id)); ?></td>
+                <td><?php echo Html::a($post->name, array('authors/read', 'id'=>$post->id)); ?></td>
                 <td><?php echo $post->second_name; ?></td>
                 <td><?php echo $post->third_name; ?></td>
                 <td>

@@ -113,3 +113,8 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+.magazins-read .image-magazin {
+    max-width: 80%;
+    width: 300px;
+}

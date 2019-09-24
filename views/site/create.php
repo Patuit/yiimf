@@ -1,9 +1,11 @@
 <?php
+
 use app\models\Authors;
 use app\models\MagazinsAuthors;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
+
 $form = ActiveForm::begin([
     'id' => 'form-input-example',
     'options' => [
@@ -15,7 +17,7 @@ $form = ActiveForm::begin([
 
 <?php echo $form->field($model, 'title')->textInput()->label('Название'); ?>
 <?php echo $form->field($model, 'description')->textInput()->label('Описание'); ?>
-<?php echo $form->field($model, 'image')->fileInput()->label('Изображение'); ?>
+<?php echo $form->field($imageModel, 'image')->fileInput()->label('Изображение'); ?>
 <?php
 if ($authors)
     $authors->id = $authorsArray;
@@ -24,7 +26,7 @@ $form
     ->field($authors, 'id')
     ->listBox(
         \yii\helpers\ArrayHelper::map(Authors::find()->all(), 'id', 'name'),
-            ['multiple' => true]
+        ['multiple' => true]
     )->label('Авторы');
 ?>
 <?php echo $form->field($model, 'date')->widget(
@@ -33,7 +35,7 @@ $form
         'name' => 'anniversary',
         'readonly' => true,
         'pluginOptions' => [
-            'autoclose'=>true,
+            'autoclose' => true,
             'format' => 'yyyy-mm-dd'
         ]
     ]

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use phpDocumentor\Reflection\DocBlock\Tags\Author;
 use Yii;
 use \yii\base\HttpException;
 use yii\web\Controller;
@@ -40,21 +41,29 @@ class AuthorsController extends Controller
 
     /**
      * Вывод конкретного Автора
+     * Вместе со списком принадлежащих ему журналов
      * @param null $id
      */
-    public function actionRead($id=NULL)
+    public function actionRead($id = NULL)
     {
         if ($id === NULL)
             throw new HttpException(404, 'Not Found');
 
-        $post = Authors::find()->where(['id'=>$id])
+        $post = Authors::find()
+            ->where(['id' => $id])
             ->one();
+
+        $magazins = $post
+            ->getMagazinsAuthors()
+            ->joinWith('mag', 'aut')
+            ->all();
 
         if ($post === NULL)
             throw new HttpException(404, 'Document Does Not Exist');
 
         echo $this->render('read', array(
-            'post' => $post
+            'post' => $post,
+            'magazins' => $magazins
         ));
     }
 
@@ -64,23 +73,29 @@ class AuthorsController extends Controller
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function actionDelete($id=NULL)
+    public function actionDelete($id = NULL)
     {
-        if ($id === NULL)
-        {
-            Yii::$app->session->setFlash('PostDeletedError');
-            Yii::$app->getResponse()->redirect(array('site/index'));
+        if ($id === NULL) {
+            Yii::$app
+                ->session
+                ->setFlash('PostDeletedError');
+            Yii::$app
+                ->getResponse()
+                ->redirect(array('site/index'));
         }
 
         $post = Authors::find()
-            ->where(['id'=>$id])
+            ->where(['id' => $id])
             ->one();
 
 
-        if ($post === NULL)
-        {
-            Yii::$app->session->setFlash('PostDeletedError');
-            Yii::$app->getResponse()->redirect(array('site/index'));
+        if ($post === NULL) {
+            Yii::$app
+                ->session
+                ->setFlash('PostDeletedError');
+            Yii::$app
+                ->getResponse()
+                ->redirect(array('site/index'));
         }
 
         $post->delete();
@@ -95,8 +110,7 @@ class AuthorsController extends Controller
     public function actionCreate()
     {
         $model = new Authors();
-        if (isset($_POST['Authors']))
-        {
+        if (isset($_POST['Authors'])) {
             $model->name = $_POST['Authors']['name'];
             $model->second_name = $_POST['Authors']['second_name'];
             $model->third_name = $_POST['Authors']['third_name'];
@@ -115,20 +129,19 @@ class AuthorsController extends Controller
      * Редактирование информации об Авторе
      * @param null $id
      */
-    public function actionUpdate($id=NULL)
+    public function actionUpdate($id = NULL)
     {
         if ($id === NULL)
             throw new HttpException(404, 'Not Found');
 
         $model = Authors::find()
-            ->where(['id'=>$id])
+            ->where(['id' => $id])
             ->one();
 
         if ($model === NULL)
             throw new HttpException(404, 'Document Does Not Exist');
 
-        if (isset($_POST['Authors']))
-        {
+        if (isset($_POST['Authors'])) {
             $model->name = $_POST['Authors']['name'];
             $model->second_name = $_POST['Authors']['second_name'];
             $model->third_name = $_POST['Authors']['third_name'];

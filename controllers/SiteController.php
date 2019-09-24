@@ -13,6 +13,8 @@ use app\models\ContactForm;
 use app\models\Magazins;
 use app\models\Authors;
 use app\models\MagazinsAuthors;
+use app\models\UploadImage;
+use yii\web\UploadedFile;
 
 class SiteController extends Controller
 {
@@ -66,13 +68,9 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $data = Magazins::find()->all();
+
         $authors = [];
         foreach ($data as $key => $item) {
-//            if ($item->getMagazinsAuthors()->with('aut', 'mag')->all()) {
-//                $answer[$key] = $item->getMagazinsAuthors()->with('aut', 'mag')->all();
-//            } else {
-//                $answer[$key][0] = $item->getMagazinsAuthors()->one();
-//            }
             if ($item->getMagazinsAuthors()->with('aut')->all()) {
                 foreach ($item->getMagazinsAuthors()->with('aut')->all() as $keyAuthors => $author) {
                     $authors[$key] .=
@@ -96,14 +94,27 @@ class SiteController extends Controller
         if ($id === NULL)
             throw new HttpException(404, 'Not Found');
 
-        $data = Magazins::find()->where(['id' => $id])->one();
-        $answer = $data->getMagazinsAuthors()->with('aut', 'mag')->all();
+        $magazinsModel = Magazins::find()
+            ->where(['id' => $id])
+            ->one();
 
-        if ($answer === NULL)
+        $authorsModel = $magazinsModel
+            ->getMagazinsAuthors()
+            ->joinWith('mag', 'aut')
+            ->all();
+
+        // Формируется строка авторов
+        foreach ($authorsModel as $author) {
+            $authorsArr[] = $author->aut->name . " " . $author->aut->second_name;
+        }
+        $authorsStr = implode(', ', $authorsArr) . '.';
+
+        if ($magazinsModel === NULL)
             throw new HttpException(404, 'Document Does Not Exist');
 
         echo $this->render('read', array(
-            'post' => $answer
+            'post' => $magazinsModel,
+            'authors' => $authorsStr,
         ));
     }
 
@@ -131,13 +142,19 @@ class SiteController extends Controller
 
     public function actionCreate()
     {
+        $imageModel = new UploadImage();
+        if (Yii::$app->request->isPost) {
+            $imageModel->image = UploadedFile::getInstance($imageModel, 'image');
+            $imageModel->upload();
+        }
+
         $model = new Magazins();
         $authors = new Authors();
         $magazinsAuthors = new MagazinsAuthors();
         if (isset($_POST['Magazins'])) {
             $model->title = $_POST['Magazins']['title'];
             $model->description = $_POST['Magazins']['description'];
-            $model->image = $_POST['Magazins']['image'];
+            $model->image = $imageModel->image->name;
             $model->date = $_POST['Magazins']['date'];
             $model->save();
             if ($model->save()) {
@@ -157,12 +174,19 @@ class SiteController extends Controller
         echo $this->render('create', array(
             'model' => $model,
             'authors' => $authors,
+            'imageModel' => $imageModel,
         ));
     }
 
 
     public function actionUpdate($id = NULL)
     {
+        $imageModel = new UploadImage();
+        if (Yii::$app->request->isPost) {
+            $imageModel->image = UploadedFile::getInstance($imageModel, 'image');
+            $imageModel->upload();
+        }
+
         if ($id === NULL)
             throw new HttpException(404, 'Not Found');
 
@@ -180,7 +204,7 @@ class SiteController extends Controller
         if (isset($_POST['Magazins'])) {
             $model->title = $_POST['Magazins']['title'];
             $model->description = $_POST['Magazins']['description'];
-            $model->image = $_POST['Magazins']['image'];
+            $model->image = $imageModel->image->name;
             $model->date = $_POST['Magazins']['date'];
             $model->save();
             if ($model->save()) {
@@ -201,7 +225,7 @@ class SiteController extends Controller
                     $removeAuthors = array_diff($authorsArray, $_POST['Authors']['id']);
                     $addAuthors = array_diff($_POST['Authors']['id'], $authorsArray);
                     foreach ($addAuthors as $item) {
-                        $addMagazinsAuthorsArray[] = [$lastIdMagazins+1, $item];
+                        $addMagazinsAuthorsArray[] = [$lastIdMagazins + 1, $item];
                     }
 
                     // Если количество изменяемых авторов одинаковое
@@ -240,6 +264,7 @@ class SiteController extends Controller
             'model' => $model,
             'authors' => $authors,
             'authorsArray' => $authorsArray,
+            'imageModel' => $imageModel,
         ));
     }
 
