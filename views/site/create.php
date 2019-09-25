@@ -18,7 +18,7 @@ $form = ActiveForm::begin([
 
 <?php echo $form->field($model, 'title')->textInput()->label('Название'); ?>
 <?php echo $form->field($model, 'description')->textInput()->label('Описание'); ?>
-<?php echo $form->field($imageModel, 'image')->fileInput()->label('Изображение'); ?>
+<?php echo $form->field($model, 'image')->fileInput()->label('Изображение'); ?>
 <?php
 if ($authors)
     $authors->id = $authorsArray;

@@ -6,10 +6,15 @@
     </div>
 
     <h1><?php echo $post->title; ?></h1>
-    <?php if ($post->image): ?>
-        <img class="image-magazin" src="images/<?= $post->image ?>" alt="<?php echo $post->title; ?>">
-    <?php endif; ?>
-    <p>Описание: <?php echo $post->description; ?></p>
-    <p>Авторы: <?php echo $authors; ?></p>
-    <p>Дата: <?php echo $post->date; ?></p>
+    <div class="col-lg-3">
+        <?php if ($post->image): ?>
+            <img class="image-magazin" src="images/<?= $post->image ?>" alt="<?php echo $post->title; ?>"
+                 style="float:left;">
+        <?php endif; ?>
+    </div>
+    <div class="col-lg-6">
+        <p><strong>Описание:</strong> <?php echo $post->description; ?></p>
+        <p><strong>Авторы:</strong> <?php echo $authors; ?></p>
+        <p><strong>Дата:</strong> <?php echo $post->date; ?></p>
+    </div>
 </div>

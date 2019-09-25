@@ -3,7 +3,7 @@ $this->title = 'Журналы';
 use yii\helpers\Html;
 use yii\widgets\LinkPager;
 
-echo Html::a('Create New Post', array('site/create'), array('class' => 'btn btn-primary pull-right')); ?>
+echo Html::a('Добавить журнал', array('site/create'), array('class' => 'btn btn-primary pull-right')); ?>
     <div class="clearfix"></div>
     <hr/>
     <table class="table table-striped table-hover">
@@ -29,8 +29,8 @@ echo Html::a('Create New Post', array('site/create'), array('class' => 'btn btn-
                     echo $authors[$key];
                     ?></td>
                 <td>
-                    <?php echo Html::a('Update', array('site/update', 'id' => $magazins->id), array('class' => 'btn btn-primary')); ?>
-                    <?php echo Html::a('Delete', array('site/delete', 'id' => $magazins->id), array('class' => 'btn btn-danger')); ?>
+                    <?php echo Html::a('Изменить', array('site/update', 'id' => $magazins->id), array('class' => 'btn btn-primary')); ?>
+                    <?php echo Html::a('Удалить', array('site/delete', 'id' => $magazins->id), array('class' => 'btn btn-danger')); ?>
                 </td>
             </tr>
         <?php endforeach; ?>

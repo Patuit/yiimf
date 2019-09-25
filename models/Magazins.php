@@ -36,7 +36,16 @@ class Magazins extends \yii\db\ActiveRecord
             [['date'], 'safe'],
             [['title', 'image'], 'string', 'max' => 255],
             [['title'], 'required'],
+            [['image'], 'file', 'extensions' => 'png, jpg'],
         ];
+    }
+
+    public function upload(){
+        if($this->validate()){
+            $this->image->saveAs("images/{$this->image->baseName}.{$this->image->extension}");
+        }else{
+            return false;
+        }
     }
 
     /**

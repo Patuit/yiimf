@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use yii\widgets\LinkPager;
 ?>
 <?php $this->title = 'Авторы' ?>
-<?php echo Html::a('Create New Post', array('authors/create'), array('class' => 'btn btn-primary pull-right')); ?>
+<?php echo Html::a('Добавить автора', array('authors/create'), array('class' => 'btn btn-primary pull-right')); ?>
     <div class="clearfix"></div>
     <hr />
     <table class="table table-striped table-hover">
@@ -23,8 +23,8 @@ use yii\widgets\LinkPager;
                 <td><?php echo $post->second_name; ?></td>
                 <td><?php echo $post->third_name; ?></td>
                 <td>
-                    <?php echo Html::a('Update', array('authors/update', 'id' => $post->id), array('class' => 'btn btn-primary')); ?>
-                    <?php echo Html::a('Delete', array('authors/delete', 'id' => $post->id), array('class' => 'btn btn-danger')); ?>
+                    <?php echo Html::a('Изменить', array('authors/update', 'id' => $post->id), array('class' => 'btn btn-primary')); ?>
+                    <?php echo Html::a('Удалить', array('authors/delete', 'id' => $post->id), array('class' => 'btn btn-danger')); ?>
                 </td>
             </tr>
         <?php endforeach; ?>

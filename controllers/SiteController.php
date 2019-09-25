@@ -192,12 +192,6 @@ class SiteController extends Controller
 
     public function actionUpdate($id = NULL)
     {
-        $imageModel = new UploadImage();
-        if (Yii::$app->request->isPost) {
-            $imageModel->image = UploadedFile::getInstance($imageModel, 'image');
-            $imageModel->upload();
-        }
-
         if ($id === NULL)
             throw new HttpException(404, 'Not Found');
 
@@ -216,7 +210,10 @@ class SiteController extends Controller
             $post = \Yii::$app->request->post();
             $model->title = $post['Magazins']['title'];
             $model->description = $post['Magazins']['description'];
-            $model->image = $imageModel->image->name;
+            if (isset(UploadedFile::getInstance($model, 'image')->name)) {
+                $model->image = UploadedFile::getInstance($model, 'image');
+                $model->upload();
+            }
             $model->date = $post['Magazins']['date'];
             $model->save();
             if ($model->save()) {
@@ -274,7 +271,6 @@ class SiteController extends Controller
                 'model' => $model,
                 'authors' => $authors,
                 'authorsArray' => $authorsArray,
-                'imageModel' => $imageModel,
             ));
         }
         $authors = new Authors();
@@ -282,7 +278,6 @@ class SiteController extends Controller
             'model' => $model,
             'authors' => $authors,
             'authorsArray' => $authorsArray,
-            'imageModel' => $imageModel,
         ));
     }
 

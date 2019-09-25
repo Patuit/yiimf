@@ -115,6 +115,6 @@ a.desc:after {
 }
 
 .magazins-read .image-magazin {
-    max-width: 80%;
+    max-width: 100%;
     width: 300px;
 }
